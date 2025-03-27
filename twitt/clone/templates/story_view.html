@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ story_user.username }}'s Story - Twitt{% endblock %}
+
+{% block extra_css %}
+<style>
+    .story-container {
+        position: relative;
+        height: 80vh ;
+        background-color: #000;
+        overflow: hidden;
+    }
+    
+    .story-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .story-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        color: white;
+        z-index: 10;
+    }
+    
+    .story-progress {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    
+    .story-progress-bar {
+        height: 3px;
+        background-color: rgba(255,255,255,0.3);
+        flex-grow: 1;
+        margin: 0 2px;
+    }
+    
+    .story-progress-bar.active {
+        background-color: white;
+    }
+    
+    .story-controls {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+    }
+    
+    .story-control {
+        flex: 1;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="story-container">
+    <div class="story-header">
+        <div class="story-progress">
+            {% for story in stories %}
+            <div class="story-progress-bar {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></div>
+            {% endfor %}
+        </div>
+        
+        <div class="d-flex align-items-center">
+            <a href="{% url 'profile' story_user.username %}" class="text-white mr-3">
+                <img src="{{ story_user.profile.profile_pic.url }}" class="rounded-circle profile-img-sm" alt="{{ story_user.username }}">
+            </a>
+            <div>
+                <h5 class="mb-0">{{ story_user.username }}</h5>
+                <small id="story-timestamp"></small>
+            </div>
+            <a href="{% url 'home' %}" class="btn btn-dark btn-sm ml-auto">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+    </div>
+    
+    <img id="story-image" src="{{ stories.0.image.url }}" class="story-image" alt="Story">
+    
+    <div class="story-controls">
+        <div class="story-control" id="prev-story"></div>
+        <div class="story-control" id="next-story"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        const stories = [
+            {% for story in stories %}
+            {
+                id: {{ story.id }},
+                image: "{{ story.image.url }}",
+                timestamp: "{{ story.created_at|date:'M d, Y H:i' }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        let currentIndex = 0;
+        let storyInterval;
+        const storyDuration = 5000; // 5 seconds per story
+        
+        function showStory(index) {
+            // Clear any existing interval
+            if (storyInterval) {
+                clearInterval(storyInterval);
+            }
+            
+            // Update current index
+            currentIndex = index;
+            
+            // Update image and timestamp
+            $('#story-image').attr('src', stories[index].image);
+            $('#story-timestamp').text(stories[index].timestamp);
+            
+            // Update progress bars
+            $('.story-progress-bar').removeClass('active');
+            $(`.story-progress-bar[data-index="${index}"]`).addClass('active');
+            
+            // Start timer for next story
+            storyInterval = setTimeout(() => {
+                if (currentIndex < stories.length - 1) {
+                    showStory(currentIndex + 1);
+                } else {
+                    // End of stories, go back to home
+                    window.location.href = "{% url 'home' %}";
+                }
+            }, storyDuration);
+        }
+        
+        // Initialize with first story
+        showStory(0);
+        
+        // Previous story control
+        $('#prev-story').click(function() {
+            if (currentIndex > 0) {
+                showStory(currentIndex - 1);
+            }
+        });
+        
+        // Next story control
+        $('#next-story').click(function() {
+            if (currentIndex < stories.length - 1) {
+                showStory(current  {
+            if (currentIndex < stories.length - 1) {
+                showStory(currentIndex + 1);
+            } else {
+                // End of stories, go back to home
+                window.location.href = "{% url 'home' %}";
+            }
+        });
+    });
+</script>
+{% endblock %}
+

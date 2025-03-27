@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ user_profile.username }} - Twitt{% endblock %}
+
+{% block content %}
+<div class="profile-header mb-4">
+    <div class="row">
+        <div class="col-md-3 text-center">
+            <img src="{{ user_profile.profile.profile_pic.url }}" class="rounded-circle profile-img-xl" alt="{{ user_profile.username }}">
+        </div>
+        <div class="col-md-9">
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0 mr-3">{{ user_profile.username }}</h2>
+                {% if user.is_authenticated and user != user_profile %}
+                <form action="{% url 'follow-toggle' user_profile.username %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if is_following %}btn-outline-secondary{% else %}btn-primary{% endif %}">
+                        {% if is_following %}Unfollow{% else %}Follow{% endif %}
+                    </button>
+                </form>
+                {% elif user == user_profile %}
+                <a href="{% url 'edit-profile' %}" class="btn btn-outline-secondary">Edit Profile</a>
+                {% endif %}
+            </div>
+            
+            <div class="profile-stats d-flex mb-3">
+                <div class="mr-4"><strong>{{ posts_count }}</strong> posts</div>
+                <div class="mr-4"><strong>{{ followers_count }}</strong> followers</div>
+                <div><strong>{{ following_count }}</strong> following</div>
+            </div>
+            
+            <div class="profile-bio">
+                <p class="mb-0">{{ user_profile.profile.bio }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="profile-posts">
+    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="true">
+                <i class="fas fa-th"></i> Posts
+            </a>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="profileTabsContent">
+        <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-md-4 mb-4">
+                    <a href="{% url 'post-detail' post.id %}" class="post-thumbnail">
+                        <img src="{{ post.image.url }}" class="img-fluid" alt="Post by {{ user_profile.username }}">
+                        <div class="post-overlay">
+                            <div class="post-stats">
+                                <span><i class="fas fa-heart"></i> {{ post.get_likes_count }}</span>
+                                <span><i class="fas fa-comment"></i> {{ post.get_comments_count }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No posts yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Conversation with {{ other_user.username }} - Twitt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'profile' other_user.username %}" class="text-white mr-3">
+                        <img src="{{ other_user.profile.profile_pic.url }}" class="rounded-circle profile-img-sm" alt="{{ other_user.username }}">
+                    </a>
+                    <h4 class="mb-0">{{ other_user.username }}</h4>
+                    <a href="{% url 'direct-messages' %}" class="btn btn-light btn-sm ml-auto">
+                        <i class="fas fa-arrow-left"></i> Back to Messages
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-body conversation-body">
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="message {% if message.sender == user %}message-sent{% else %}message-received{% endif %} mb-3">
+                        <div class="message-content">
+                            <p class="mb-0">{{ message.content }}</p>
+                            <small class="text-muted">{{ message.created_at|naturaltime }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        {{ form.content }}
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Scroll to bottom of conversation
+        const messagesContainer = $('.messages-container');
+        messagesContainer.scrollTop(messagesContainer.prop('scrollHeight'));
+        
+        // Auto-focus the message input
+        $('#id_content').focus();
+    });
+</script>
+{% endblock %}
+

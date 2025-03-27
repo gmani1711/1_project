@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Twitt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">Login</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password">Password</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <p>Or login with:</p>
+                    <a href="{% url 'socialaccount_login' 'google' %}" class="btn btn-danger">
+                        <i class="fab fa-google"></i> Google
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

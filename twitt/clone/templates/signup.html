@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Twitt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h2 class="text-center mb-0">Sign Up</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password1">Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="text-danger">
+                                {% for error in form.password1.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password2">Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="text-danger">
+                                {% for error in form.password2.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Sign Up</button>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <p>Or sign up with:</p>
+                    <a href="{% url 'socialaccount_login' 'google' %}" class="btn btn-danger">
+                        <i class="fab fa-google"></i> Google
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

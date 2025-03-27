@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Home - Twitt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Sidebar -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Welcome, {{ user.username }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle profile-img-lg" alt="{{ user.username }}">
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'profile' user.username %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    <a href="{% url 'edit-profile' %}" class="btn btn-outline-secondary btn-sm">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Suggestions</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Users you might want to follow</p>
+                <!-- This would be populated with actual user suggestions -->
+                <div class="suggestion-user d-flex align-items-center mb-2">
+                    <img src="/static/images/default.jpg" class="rounded-circle profile-img-sm mr-2" alt="User">
+                    <div>
+                        <a href="#" class="font-weight-bold">username</a>
+                        <button class="btn btn-sm btn-primary ml-2">Follow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-md-6">
+        <!-- Stories -->
+        {% if active_stories %}
+        <div class="stories-container mb-4">
+            <div class="d-flex overflow-auto">
+                {% for story in active_stories %}
+                <div class="story-item mx-2">
+                    <a href="{% url 'view-story' story.user.username %}">
+                        <div class="story-avatar">
+                            <img src="{{ story.user.profile.profile_pic.url }}" class="rounded-circle" alt="{{ story.user.username }}">
+                        </div>
+                        <p class="text-center small mt-1">{{ story.user.username }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Create Post Button -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <a href="{% url 'post-create' %}" class="btn btn-primary btn-block">
+                    <i class="fas fa-plus-circle"></i> Create New Post
+                </a>
+            </div>
+        </div>
+        
+        <!-- Posts Feed -->
+        {% for post in posts %}
+        <div class="card mb-4 post-card">
+            <div class="card-header bg-white">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'profile' post.user.username %}">
+                        <img src="{{ post.user.profile.profile_pic.url }}" class="rounded-circle profile-img-sm mr-2" alt="{{ post.user.username }}">
+                    </a>
+                    <a href="{% url 'profile' post.user.username %}" class="font-weight-bold text-dark">{{ post.user.username }}</a>
+                </div>
+            </div>
+            <img src="{{ post.image.url }}" class="card-img-top" alt="Post by {{ post.user.username }}">
+            <div class="card-body">
+                <div class="post-actions mb-3">
+                    <button class="btn btn-link like-button {% if post.liked_by_user %}liked{% endif %}" data-post-id="{{ post.id }}">
+                        <i class="{% if post.liked_by_user %}fas{% else %}far{% endif %} fa-heart"></i>
+                    </button>
+                    <a href="{% url 'post-detail' post.id %}" class="btn btn-link">
+                        <i class="far fa-comment"></i>
+                    </a>
+                    <a href="#" class="btn btn-link">
+                        <i class="far fa-paper-plane"></i>
+                    </a>
+                </div>
+                <p class="likes-count mb-1"><strong>{{ post.get_likes_count }} likes</strong></p>
+                {% if post.caption %}
+                <p class="card-text">
+                    <a href="{% url 'profile' post.user.username %}" class="font-weight-bold text-dark">{{ post.user.username }}</a>
+                    {{ post.caption }}
+                </p>
+                {% endif %}
+                {% if post.get_comments_count > 0 %}
+                <a href="{% url 'post-detail' post.id %}" class="text-muted">View all {{ post.get_comments_count }} comments</a>
+                {% endif %}
+                <p class="text-muted small mt-2">{{ post.created_at|naturaltime }}</p>
+            </div>
+            <div class="card-footer bg-white">
+                <form action="{% url 'add-comment' post.id %}" method="post" class="comment-form">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="text" class="form-control" placeholder="Add a comment..." required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit">Post</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card">
+            <div class="card-body text-center">
+                <p class="mb-0">No posts yet. Follow users or create your first post!</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Right Sidebar -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Direct Messages</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'direct-messages' %}" class="btn btn-outline-primary btn-block">
+                    <i class="fas fa-envelope"></i> View Messages
+                </a>
+                <hr>
+                <p class="text-muted">Recent conversations</p>
+                <!-- This would be populated with actual conversations -->
+                <div class="conversation-user d-flex align-items-center mb-2">
+                    <img src="/static/images/default.jpg" class="rounded-circle profile-img-sm mr-2" alt="User">
+                    <div>
+                        <a href="#" class="font-weight-bold">username</a>
+                        <p class="text-muted small mb-0">Last message...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Like button functionality
+        $('.like-button').click(function() {
+            const postId = $(this).data('post-id');
+            const button = $(this);
+            
+            $.ajax({
+                url: `/post/${postId}/like/`,
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function(data) {
+                    if (data.liked) {
+                        button.find('i').removeClass('far').addClass('fas');
+                    } else {
+                        button.find('i').removeClass('fas').addClass('far');
+                    }
+                    button.closest('.card-body').find('.likes-count').text(`${data.likes_count} likes`);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

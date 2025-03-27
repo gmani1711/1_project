@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Direct Messages - Twitt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Direct Messages</h4>
+            </div>
+            <div class="card-body">
+                {% if conversations %}
+                <div class="list-group">
+                    {% for user in conversations %}
+                    <a href="{% url 'conversation' user.username %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle profile-img-sm mr-3" alt="{{ user.username }}">
+                            <div>
+                                <h5 class="mb-1">{{ user.username }}</h5>
+                                <p class="mb-0 text-muted small">
+                                    {% if user.last_message %}
+                                    {{ user.last_message.content|truncatechars:50 }}
+                                    {% else %}
+                                    Start a conversation
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% if user.unread_count > 0 %}
+                            <span class="badge badge-primary badge-pill ml-auto">{{ user.unread_count }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-envelope fa-3x mb-3 text-muted"></i>
+                    <p>You don't have any messages yet.</p>
+                    <p>Start a conversation by visiting someone's profile!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
